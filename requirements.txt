@@ -1,0 +1,12 @@
+python-telegram-bot==20.7
+Pillow==10.2.0
+pytesseract==0.3.10
+
+def create_inline_keyboard(buttons):
+    """Crea un teclado con botones inline"""
+    return InlineKeyboardMarkup(buttons)
+
+# Crear el markup para el botón inline
+inline_markup = InlineKeyboardMarkup([
+    [InlineKeyboardButton("📲 Compartir Enlace", switch_inline_query=f"Te invito a unirte con mi enlace: {referral_link}")]
+])
