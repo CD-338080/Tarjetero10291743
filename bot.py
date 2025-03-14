@@ -245,10 +245,18 @@ async def request_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     return WAITING_RECEIPT
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Maneja las pulsaciones de botones inline (para casos específicos)."""
+    """Maneja las pulsaciones de botones inline."""
     query = update.callback_query
+    if not query:
+        return MAIN_MENU
+        
     await query.answer()
     
+    # Asegurarse de que tenemos un chat_id válido
+    chat_id = update.effective_chat.id
+    if not chat_id:
+        return MAIN_MENU
+        
     choice = query.data
     
     if choice == "main_menu":
@@ -837,7 +845,9 @@ def main() -> None:
     """Inicia el bot."""
     try:
         # Token del bot obtenido de BotFather
-        token = os.environ.get("TELEGRAM_TOKEN", "7476575828:AAGlDaQmH8w4rf0oLyTba8z6duJ91E4QFBo")
+        token = os.environ.get("TELEGRAM_TOKEN")
+        if not token:
+            token = "7476575828:AAGlDaQmH8w4rf0oLyTba8z6duJ91E4QFBo"  # Fallback token
         application = Application.builder().token(token).build()
         
         # Manejador de conversación principal
@@ -846,23 +856,23 @@ def main() -> None:
             states={
                 MAIN_MENU: [
                     MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler),
-                    CallbackQueryHandler(button_callback)
+                    CallbackQueryHandler(button_callback, pattern="^.*$")
                 ],
                 PRODUCTS: [
                     MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler),
-                    CallbackQueryHandler(button_callback)
+                    CallbackQueryHandler(button_callback, pattern="^.*$")
                 ],
                 PAYMENT: [
                     MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler),
-                    CallbackQueryHandler(button_callback)
+                    CallbackQueryHandler(button_callback, pattern="^.*$")
                 ],
                 FAQ: [
                     MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler),
-                    CallbackQueryHandler(button_callback)
+                    CallbackQueryHandler(button_callback, pattern="^.*$")
                 ],
                 REFERRALS: [
                     MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler),
-                    CallbackQueryHandler(button_callback)
+                    CallbackQueryHandler(button_callback, pattern="^.*$")
                 ],
                 WAITING_RECEIPT: [
                     MessageHandler(filters.PHOTO, handle_receipt),
@@ -870,6 +880,7 @@ def main() -> None:
                 ],
             },
             fallbacks=[CommandHandler("start", start)],
+            allow_reentry=True
         )
         
         # Manejador para mensajes fuera de la conversación
