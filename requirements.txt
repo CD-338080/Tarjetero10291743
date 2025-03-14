@@ -1,6 +1,7 @@
 python-telegram-bot==20.7
 Pillow==10.2.0
 pytesseract==0.3.10
+python-dotenv==1.0.0
 
 def create_inline_keyboard(buttons):
     """Crea un teclado con botones inline"""
